@@ -1,6 +1,6 @@
 import numpy as np
 
-def saturation_vapor_pressure(temperature):
+def vapor_pressure(temperature):
      # Temperature in Celsius
     # Code modeled after the Clausius-Clapeyron equation found here:
     # https://glossary.ametsoc.org/wiki/Clausius-clapeyron_equation
@@ -16,15 +16,17 @@ def relative_humidity(temperature, dewpoint):
     if temperature is None or dewpoint is None:
         raise Exception("Cannot run with missing temperature and/or dewpoint values.")
 
-    e = saturation_vapor_pressure(dewpoint)
-    es = saturation_vapor_pressure(temperature)
+    e = vapor_pressure(dewpoint)
+    es = vapor_pressure(temperature)
 
     return e / es
 
 
+def dewpoint(temperature, relative_humidity):
+    vp = relative_humidity * vapor_pressure(temperature)    
+    return dewpoint(vp)
 
-import unittest
-
-class MyTest(unittest.TestCase):
-    def test(self):
-        self.assertEqual(fun(3), 4)
+def dewpoint(vapor_pressure):
+    # Inverse of the Clausius-Clapeyron Equation
+    alpha = np.ln(vapor_pressure(vapor_pressure)/611.2)
+    return 243.5 * alpha / (17.67 - alpha)
